@@ -34,9 +34,15 @@ class _ExerciseDetailsPageState extends ConsumerState<ExerciseDetailsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text(widget.name)),
-      body: Column(
+      body: Stack(
         children: [
-          Expanded(child: ModelViewer(src: widget.path, autoPlay: true)),
+          ModelViewer(src: widget.path, autoPlay: true),
+          Positioned(
+            top: 0,
+            right: 20,
+            left: 20,
+            child: _TimerComponent(time: "01:30"),
+          ),
           // Expanded(
           //   child: Flutter3DViewer(
           //     controller: controller,
@@ -73,3 +79,73 @@ class SessionNotifier extends StateNotifier<int> {
 
 final currentExerciseIndexProvider =
     StateNotifierProvider<SessionNotifier, int>((ref) => SessionNotifier());
+
+class _TimerComponent extends StatelessWidget {
+  const _TimerComponent({super.key, required this.time});
+  final String time;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFF6A5AE0), Color(0xFF6A5AE0)], // violet
+        ),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Column(
+        children: [
+          Text(
+            time,
+            style: TextStyle(
+              fontSize: 48,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+          const SizedBox(height: 4),
+          const Text(
+            "Phase de travail",
+            style: TextStyle(color: Colors.white, fontSize: 18),
+          ),
+          const SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Expanded(
+                child: OutlinedButton.icon(
+                  icon: const Icon(Icons.pause),
+                  label: const Text("Pause"),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    side: const BorderSide(color: Colors.white),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                  ),
+                  onPressed: () {},
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: OutlinedButton.icon(
+                  icon: const Icon(Icons.refresh),
+                  label: const Text("Réinit..."),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    side: const BorderSide(color: Colors.white),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                  ),
+                  onPressed: () {},
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
