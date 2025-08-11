@@ -1,14 +1,48 @@
-import 'package:flutter_3d_controller/flutter_3d_controller.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:model_viewer_plus/model_viewer_plus.dart';
 
+// --------- PROVIDER POUR LE TIMER ---------
+final timerProvider =
+    StateNotifierProvider.autoDispose<TimerNotifier, Duration>(
+      (ref) => TimerNotifier(),
+    );
+
+class TimerNotifier extends StateNotifier<Duration> {
+  TimerNotifier() : super(const Duration(seconds: 90)); // Exemple : 1 min 30
+  Timer? _timer;
+
+  void start(VoidCallback onFinish) {
+    _timer?.cancel();
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (state.inSeconds > 0) {
+        state = Duration(seconds: state.inSeconds - 1);
+      } else {
+        timer.cancel();
+        onFinish();
+      }
+    });
+  }
+
+  void pause() {
+    _timer?.cancel();
+  }
+
+  void reset(Duration newDuration) {
+    _timer?.cancel();
+    state = newDuration;
+  }
+}
+
+// --------- PAGE DETAIL ---------
 class ExerciseDetailsPage extends ConsumerStatefulWidget {
   const ExerciseDetailsPage({
     super.key,
     required this.name,
     required this.path,
   });
+
   final String name;
   final String path;
 
@@ -18,71 +52,71 @@ class ExerciseDetailsPage extends ConsumerStatefulWidget {
 }
 
 class _ExerciseDetailsPageState extends ConsumerState<ExerciseDetailsPage> {
-  final Flutter3DController controller = Flutter3DController();
-
   @override
   void initState() {
     super.initState();
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (controller.onModelLoaded.value) {
-        controller.playAnimation();
-      }
+      // Lance le timer
+      ref.read(timerProvider.notifier).start(() {
+        debugPrint("⏳ Timer terminé, arrêt de l'animation !");
+        // Ici, si on veut arrêter l’animation ou passer à autre chose
+      });
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    final timeLeft = ref.watch(timerProvider);
+
     return Scaffold(
       appBar: AppBar(title: Text(widget.name)),
       body: Stack(
         children: [
-          ModelViewer(src: widget.path, autoPlay: true),
+          // MODELE 3D
+          SizedBox(
+            height: MediaQuery.of(context).size.height,
+            width: MediaQuery.of(context).size.width,
+            child: ModelViewer(src: widget.path, autoPlay: true),
+          ),
+
+          // TIMER
           Positioned(
-            top: 0,
+            top: 10,
             right: 20,
             left: 20,
-            child: _TimerComponent(time: "01:30"),
+            child: _TimerComponent(
+              time: _formatDuration(timeLeft),
+              onPause: () => ref.read(timerProvider.notifier).pause(),
+              onReset: () => ref
+                  .read(timerProvider.notifier)
+                  .reset(const Duration(seconds: 90)),
+            ),
           ),
-          // Expanded(
-          //   child: Flutter3DViewer(
-          //     controller: controller,
-          //     onLoad: (modelAddress) {
-          //       print(modelAddress);
-          //     },
-          //     onProgress: (progressValue) {
-          //       print(progressValue);
-          //       if (progressValue == 1.0) {
-          //         controller.playAnimation();
-          //       } else {}
-          //     },
-          //     src: widget.path, // Path to your FBX model
-          //     // You can add various other properties here for animation, camera control, etc.
-          //   ),
-          // ),
         ],
       ),
     );
   }
-}
 
-class SessionNotifier extends StateNotifier<int> {
-  SessionNotifier() : super(0);
-
-  void next(int total) {
-    if (state < total - 1) {
-      state++;
-    }
+  String _formatDuration(Duration duration) {
+    String twoDigits(int n) => n.toString().padLeft(2, "0");
+    final minutes = twoDigits(duration.inMinutes);
+    final seconds = twoDigits(duration.inSeconds.remainder(60));
+    return "$minutes:$seconds";
   }
-
-  void reset() => state = 0;
 }
 
-final currentExerciseIndexProvider =
-    StateNotifierProvider<SessionNotifier, int>((ref) => SessionNotifier());
-
+// --------- WIDGET TIMER ---------
 class _TimerComponent extends StatelessWidget {
-  const _TimerComponent({super.key, required this.time});
+  const _TimerComponent({
+    required this.time,
+    required this.onPause,
+    required this.onReset,
+  });
+
   final String time;
+  final VoidCallback onPause;
+  final VoidCallback onReset;
 
   @override
   Widget build(BuildContext context) {
@@ -90,7 +124,7 @@ class _TimerComponent extends StatelessWidget {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [Color(0xFF6A5AE0), Color(0xFF6A5AE0)], // violet
+          colors: [Color(0xFF6A5AE0), Color(0xFF6A5AE0)],
         ),
         borderRadius: BorderRadius.circular(20),
       ),
@@ -98,7 +132,7 @@ class _TimerComponent extends StatelessWidget {
         children: [
           Text(
             time,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 48,
               fontWeight: FontWeight.bold,
               color: Colors.white,
@@ -124,7 +158,7 @@ class _TimerComponent extends StatelessWidget {
                       borderRadius: BorderRadius.circular(30),
                     ),
                   ),
-                  onPressed: () {},
+                  onPressed: onPause,
                 ),
               ),
               const SizedBox(width: 8),
@@ -139,7 +173,7 @@ class _TimerComponent extends StatelessWidget {
                       borderRadius: BorderRadius.circular(30),
                     ),
                   ),
-                  onPressed: () {},
+                  onPressed: onReset,
                 ),
               ),
             ],
