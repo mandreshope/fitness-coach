@@ -70,7 +70,8 @@ class _ExerciseDetailsPageState extends ConsumerState<ExerciseDetailsPage> {
     final timeLeft = ref.watch(timerProvider);
 
     return Scaffold(
-      appBar: AppBar(title: Text(widget.name)),
+      backgroundColor: Colors.white,
+      appBar: AppBar(title: Text(widget.name), backgroundColor: Colors.white),
       body: Stack(
         children: [
           // MODELE 3D

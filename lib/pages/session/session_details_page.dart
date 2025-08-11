@@ -19,10 +19,8 @@ class SessionDetailsPage extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         children: [
           // TIMER BOX
-          TimerComponent(time: "00:45"),
-
+          TimerComponent(time: "01:30"),
           const SizedBox(height: 20),
-
           // APERÇU
           Container(
             padding: const EdgeInsets.all(16),
