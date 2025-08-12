@@ -50,14 +50,14 @@ class SessionDetailsPage extends StatelessWidget {
             title: "Squat",
             subtitle: "Mouvement explosif de tout le corps",
             duration: "45 seconds",
-            path: 'assets/models/squat_blender.glb',
+            path: 'assets/models/squat_minify.glb',
           ),
           _ExerciseTile(
             icon: Icons.directions_run,
-            title: "Stups",
+            title: "Situps",
             subtitle: "Exercices de base et cardio",
             duration: "45 seconds",
-            path: 'assets/models/stups_blender.glb',
+            path: 'assets/models/situps_minify.glb',
           ),
         ],
       ),
@@ -192,44 +192,60 @@ class _ExerciseTile extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
       ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: const Color(0xFFEAE6FF),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Icon(icon, color: const Color(0xFF6A5AE0)),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(fontWeight: FontWeight.bold),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) =>
+                    ExerciseDetailsPage(name: title, path: path),
+              ),
+            );
+          },
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFEAE6FF),
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                const SizedBox(height: 2),
-                Text(subtitle, style: const TextStyle(color: Colors.black54)),
-                const SizedBox(height: 2),
-                Text(duration, style: const TextStyle(color: Colors.blue)),
-              ],
-            ),
-          ),
-          IconButton(
-            icon: const Icon(Icons.play_arrow, color: Colors.black54),
-            onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) =>
-                      ExerciseDetailsPage(name: title, path: path),
+                child: Icon(icon, color: const Color(0xFF6A5AE0)),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      subtitle,
+                      style: const TextStyle(color: Colors.black54),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(duration, style: const TextStyle(color: Colors.blue)),
+                  ],
                 ),
-              );
-            },
+              ),
+              IconButton(
+                icon: const Icon(Icons.play_arrow, color: Colors.black54),
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          ExerciseDetailsPage(name: title, path: path),
+                    ),
+                  );
+                },
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
