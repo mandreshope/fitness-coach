@@ -24,3 +24,14 @@ Icon launcher generator
 ```
 flutter pub run flutter_launcher_icons:main
 ```
+
+## Build apk
+
+Run this script in project root to create apk
+
+```batch
+Usage: ./scripts/build_app.sh [android|ios|both]
+  android - Build only the Android APK
+  ios     - Build only the iOS IPA (macOS only)
+  both    - Build both Android APK and iOS IPA (macOS only)
+```
