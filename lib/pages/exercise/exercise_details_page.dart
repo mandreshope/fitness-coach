@@ -75,15 +75,20 @@ class _ExerciseDetailsPageState extends ConsumerState<ExerciseDetailsPage> {
       body: Stack(
         children: [
           // MODELE 3D
-          SizedBox(
-            height: MediaQuery.of(context).size.height,
-            width: MediaQuery.of(context).size.width,
-            child: ModelViewer(src: widget.path, autoPlay: true),
+          Positioned(
+            bottom: 0,
+            right: 0,
+            left: 0,
+            child: SizedBox(
+              height: MediaQuery.of(context).size.height * .7,
+              width: double.infinity,
+              child: ModelViewer(src: widget.path, autoPlay: true),
+            ),
           ),
 
           // TIMER
           Positioned(
-            top: 10,
+            top: 0,
             right: 20,
             left: 20,
             child: _TimerComponent(
@@ -122,7 +127,7 @@ class _TimerComponent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           colors: [Color(0xFF6A5AE0), Color(0xFF6A5AE0)],
