@@ -5,21 +5,44 @@ import 'package:model_viewer_plus/model_viewer_plus.dart';
 
 // --------- PROVIDER POUR LE TIMER ---------
 final timerProvider =
-    StateNotifierProvider.autoDispose<TimerNotifier, Duration>(
+    StateNotifierProvider.autoDispose<TimerNotifier, TimerState>(
       (ref) => TimerNotifier(),
     );
 
-class TimerNotifier extends StateNotifier<Duration> {
-  TimerNotifier() : super(const Duration(seconds: 90)); // Exemple : 1 min 30
+class TimerState {
+  final Duration timeLeft;
+  final bool isRunning;
+
+  const TimerState({required this.timeLeft, required this.isRunning});
+
+  TimerState copyWith({Duration? timeLeft, bool? isRunning}) {
+    return TimerState(
+      timeLeft: timeLeft ?? this.timeLeft,
+      isRunning: isRunning ?? this.isRunning,
+    );
+  }
+}
+
+class TimerNotifier extends StateNotifier<TimerState> {
+  TimerNotifier()
+    : super(
+        const TimerState(timeLeft: Duration(seconds: 90), isRunning: false),
+      );
+
   Timer? _timer;
 
   void start(VoidCallback onFinish) {
     _timer?.cancel();
+    state = state.copyWith(isRunning: true);
+
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (state.inSeconds > 0) {
-        state = Duration(seconds: state.inSeconds - 1);
+      if (state.timeLeft.inSeconds > 0) {
+        state = state.copyWith(
+          timeLeft: Duration(seconds: state.timeLeft.inSeconds - 1),
+        );
       } else {
         timer.cancel();
+        state = state.copyWith(isRunning: false);
         onFinish();
       }
     });
@@ -27,11 +50,20 @@ class TimerNotifier extends StateNotifier<Duration> {
 
   void pause() {
     _timer?.cancel();
+    state = state.copyWith(isRunning: false);
+  }
+
+  void toggle(VoidCallback onFinish) {
+    if (state.isRunning) {
+      pause();
+    } else {
+      start(onFinish);
+    }
   }
 
   void reset(Duration newDuration) {
     _timer?.cancel();
-    state = newDuration;
+    state = TimerState(timeLeft: newDuration, isRunning: false);
   }
 }
 
@@ -57,17 +89,15 @@ class _ExerciseDetailsPageState extends ConsumerState<ExerciseDetailsPage> {
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      // Lance le timer
       ref.read(timerProvider.notifier).start(() {
         debugPrint("⏳ Timer terminé, arrêt de l'animation !");
-        // Ici, si on veut arrêter l’animation ou passer à autre chose
       });
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final timeLeft = ref.watch(timerProvider);
+    final timerState = ref.watch(timerProvider);
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -92,8 +122,11 @@ class _ExerciseDetailsPageState extends ConsumerState<ExerciseDetailsPage> {
             right: 20,
             left: 20,
             child: _TimerComponent(
-              time: _formatDuration(timeLeft),
-              onPause: () => ref.read(timerProvider.notifier).pause(),
+              time: _formatDuration(timerState.timeLeft),
+              isRunning: timerState.isRunning,
+              onToggle: () => ref
+                  .read(timerProvider.notifier)
+                  .toggle(() => debugPrint("Timer terminé")),
               onReset: () => ref
                   .read(timerProvider.notifier)
                   .reset(const Duration(seconds: 90)),
@@ -112,16 +145,17 @@ class _ExerciseDetailsPageState extends ConsumerState<ExerciseDetailsPage> {
   }
 }
 
-// --------- WIDGET TIMER ---------
 class _TimerComponent extends StatelessWidget {
   const _TimerComponent({
     required this.time,
-    required this.onPause,
+    required this.isRunning,
+    required this.onToggle,
     required this.onReset,
   });
 
   final String time;
-  final VoidCallback onPause;
+  final bool isRunning;
+  final VoidCallback onToggle;
   final VoidCallback onReset;
 
   @override
@@ -162,8 +196,8 @@ class _TimerComponent extends StatelessWidget {
                       borderRadius: BorderRadius.circular(30),
                     ),
                   ),
-                  onPressed: onPause,
-                  child: Icon(Icons.pause),
+                  onPressed: onToggle,
+                  child: Icon(isRunning ? Icons.pause : Icons.play_arrow),
                 ),
               ),
               const SizedBox(width: 8),
