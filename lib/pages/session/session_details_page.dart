@@ -99,9 +99,7 @@ class TimerComponent extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Expanded(
-                child: ElevatedButton.icon(
-                  icon: const Icon(Icons.play_arrow),
-                  label: const Text("Start"),
+                child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
                     foregroundColor: const Color(0xFF6A5AE0),
@@ -110,13 +108,12 @@ class TimerComponent extends StatelessWidget {
                     ),
                   ),
                   onPressed: () {},
+                  child: const Icon(Icons.play_arrow),
                 ),
               ),
               const SizedBox(width: 8),
               Expanded(
-                child: OutlinedButton.icon(
-                  icon: const Icon(Icons.pause),
-                  label: const Text("Pause"),
+                child: OutlinedButton(
                   style: OutlinedButton.styleFrom(
                     foregroundColor: Colors.white,
                     side: const BorderSide(color: Colors.white),
@@ -125,13 +122,12 @@ class TimerComponent extends StatelessWidget {
                     ),
                   ),
                   onPressed: () {},
+                  child: const Icon(Icons.pause),
                 ),
               ),
               const SizedBox(width: 8),
               Expanded(
-                child: OutlinedButton.icon(
-                  icon: const Icon(Icons.refresh),
-                  label: const Text("Réinit..."),
+                child: OutlinedButton(
                   style: OutlinedButton.styleFrom(
                     foregroundColor: Colors.white,
                     side: const BorderSide(color: Colors.white),
@@ -140,6 +136,7 @@ class TimerComponent extends StatelessWidget {
                     ),
                   ),
                   onPressed: () {},
+                  child: Icon(Icons.refresh),
                 ),
               ),
             ],

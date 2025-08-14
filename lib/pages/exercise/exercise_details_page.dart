@@ -154,9 +154,7 @@ class _TimerComponent extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Expanded(
-                child: OutlinedButton.icon(
-                  icon: const Icon(Icons.pause),
-                  label: const Text("Pause"),
+                child: OutlinedButton(
                   style: OutlinedButton.styleFrom(
                     foregroundColor: Colors.white,
                     side: const BorderSide(color: Colors.white),
@@ -165,13 +163,12 @@ class _TimerComponent extends StatelessWidget {
                     ),
                   ),
                   onPressed: onPause,
+                  child: Icon(Icons.pause),
                 ),
               ),
               const SizedBox(width: 8),
               Expanded(
-                child: OutlinedButton.icon(
-                  icon: const Icon(Icons.refresh),
-                  label: const Text("Réinit..."),
+                child: OutlinedButton(
                   style: OutlinedButton.styleFrom(
                     foregroundColor: Colors.white,
                     side: const BorderSide(color: Colors.white),
@@ -180,6 +177,7 @@ class _TimerComponent extends StatelessWidget {
                     ),
                   ),
                   onPressed: onReset,
+                  child: const Icon(Icons.refresh),
                 ),
               ),
             ],
